@@ -32,7 +32,6 @@ def relaisOn(num,cards,ser):
 
 
     toSend=bytes([command, addr, data, xor])
-    print("relais on :"+str(toSend))
     ser.write(toSend)
     
     data=ser.read(4)
@@ -65,7 +64,6 @@ def relaisOff(num, cards, ser):
 
 
     toSend=bytes([command, addr, data, xor])
-    print("relais off :"+str(toSend))
     ser.write(toSend)
     
     data=ser.read(4)
