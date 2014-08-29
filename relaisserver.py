@@ -83,7 +83,26 @@ class RelaisRequestHandler(socketserver.StreamRequestHandler):
                     self.request.send(bytes('400 Error switching port off. '+str(msg)+'\n',"utf-8"))
                     continue
                 self.request.send(bytes('200 OK\n',"utf-8"))
-    
+
+            ########### TEST
+            elif cmd[0] == 'test':
+                for i in range(0,len(cards)*8):
+                    (res,msg)=rc.relaisOn(i,cards,ser)
+                    if not res:
+                        self.request.send(bytes('400 Test failed at '+str(i)+'. '+str(msg)+'\n',"utf-8"))
+                        continue
+                    time.sleep(0.1)
+                
+                for i in range(0,len(cards)*8):
+                    (res,msg)=rc.relaisOff(i,cards,ser)
+                    if not res:
+                        self.request.send(bytes('400 Test failed at '+str(i)+'. '+str(msg)+'\n',"utf-8"))
+                        continue
+                    time.sleep(0.1)
+                    
+                self.request.send(bytes('200 OK\n',"utf-8"))
+
+                
             ########### UNKNOWN CMD                
             else:
                 self.request.send(bytes('500 Unknown comand: '+str(cmd[0])+'\n',"utf-8"))
