@@ -19,21 +19,75 @@ class RelaisRequestHandler(socketserver.StreamRequestHandler):
         return
 
     def handle(self):
+        global cards, ser
         print('Waiting for data...')
 
-        # Echo the back to the client
         while True:
             data=self.rfile.readline().strip()
             if len(data) == 0:
                 break
 
-            print("recv *"+str(data)+"*")
             if data == bytes("quit","utf-8"):
-                self.request.send(bytes('Bye\n',"utf-8"))
+                
+                self.request.send(bytes('200 Bye\n',"utf-8"))
                 break
-            print('recv()->"%s"', data)
-            self.request.send(data)
-            self.request.send(bytes('\n',"utf-8"))
+            
+            cmd=data.decode('utf-8').split()
+            if len(cmd) == 0:
+                self.request.send(bytes('500 No comand\n',"utf-8"))
+                continue
+
+            ########### QUERY STATE
+            if cmd[0] == 'state':
+                reply="200 "
+                (result,msg,state)=rc.getPortState(cards,ser)
+                if not result:
+                    self.request.send(bytes('400 Error getting port state'+str(msg)+'\n',"utf-8"))
+                    continue
+                    
+                for port in state:
+                    reply+=(str(port)+", ")
+                reply=reply[:-2]+'\n'
+                self.request.send(bytes(reply,'utf-8'))
+                
+            ########### SWITCH ON
+            elif cmd[0] == 'on':
+                if len(cmd) != 2:
+                    self.request.send(bytes('500 Wrong numebr of arguments. 1 needed\n',"utf-8"))
+                    continue
+                try:
+                    nr=int(cmd[1])
+                except ValueError:
+                    self.request.send(bytes('500 Argument must be an int\n',"utf-8"))
+                    continue
+                    
+                (res,msg)=rc.relaisOn(nr,ser)
+                if not result:
+                    self.request.send(bytes('400 Error switching port on'+str(msg)+'\n',"utf-8"))
+                    continue
+                self.request.send(bytes('200 OK\n',"utf-8"))
+
+            ########### SWITCH OFF
+            elif cmd[0] == 'off':
+                if len(cmd) != 2:
+                    self.request.send(bytes('500 Wrong numebr of arguments. 1 needed\n',"utf-8"))
+                    continue
+                try:
+                    nr=int(cmd[1])
+                except ValueError:
+                    self.request.send(bytes('500 Argument must be an int\n',"utf-8"))
+                    continue
+                    
+                (res,msg)=rc.relaisOff(nr,ser)
+                if not result:
+                    self.request.send(bytes('400 Error switching port off'+str(msg)+'\n',"utf-8"))
+                    continue
+                self.request.send(bytes('200 OK\n',"utf-8"))
+    
+            ########### UNKNOWN CMD                
+            else:
+                self.request.send(bytes('500 Unknown comand: '+str(cmd[0])+'\n',"utf-8"))
+                
             
             
         return
@@ -69,8 +123,10 @@ class RelaisServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
         return socketserver.TCPServer.close_request(self, request_address)
 
 
+global ser
 ser = serial.Serial(DEVICE, 19200, timeout=2)
 
+global cards
 cards=rc.setup(ser)
 
 print("Detected boards:")
