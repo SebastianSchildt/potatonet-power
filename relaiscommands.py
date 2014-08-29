@@ -4,13 +4,15 @@
 #initialize and scan for cards
 # 1 Addr x XOR
 #always use bcast addr
-def setup():
+def setup(ser):
     command=1
     addr=1
     data =0
 
     xor=command^addr^data
-    return bytes([command, addr, data, xor])
+    toSend= bytes([command, addr, data, xor])
+    ser.write(toSend)
+    return parseSetup(ser)
 
 #switch relais on
 # 6 Addr data XOR
@@ -71,7 +73,39 @@ def relaisOff(num,ser):
     return (True, "OK")
 
 
+#Get current port state from all cards in cards. Ports in sorder of cards
+# 2 Addr x XOR
+def getPortState(cards, ser):
+    ports=[]
+    for card in cards:
+        command=2
+        addr=int(card['address'])
+        data=0
+        xor=command^addr^data
+        toSend=bytes([command, addr, data, xor])
+        #print("Query port :"+str(toSend))
+        ser.write(toSend)
+    
+        data=ser.read(4)
+        if len(data)==0:
+            return(False,"Communication Error", ports)
 
+        if data[0] == 0xff:
+            return(False,"Command Error", ports)
+
+        if not data[0] == 253:
+            return(False,"Unknown response: "+str(data))
+
+        if not xorok(data):
+            return(False,"Checksum wrong")
+        
+        boardports=data[2]
+        for i in range(0,8):
+            ports.append( (boardports>>i)&0x01 )
+        
+
+
+    return(True, "OK", ports)
 
     
 
@@ -101,10 +135,11 @@ def parseSetup(ser):
         card['firmware']=data[2]
         card['xorok']= ( data[3]==(data[0]^data[1]^data[2]))
         cards.append(card)
-        currAdr=+1
+        currAddr=currAddr+1
 
     return cards
 
                             
-
+def xorok(data):
+    return  ( data[3]==(data[0]^data[1]^data[2]))
     
