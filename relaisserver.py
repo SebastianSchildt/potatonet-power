@@ -42,7 +42,7 @@ class RelaisRequestHandler(socketserver.StreamRequestHandler):
                 reply="200 "
                 (result,msg,state)=rc.getPortState(cards,ser)
                 if not result:
-                    self.request.send(bytes('400 Error getting port state'+str(msg)+'\n',"utf-8"))
+                    self.request.send(bytes('400 Error getting port state. '+str(msg)+'\n',"utf-8"))
                     continue
                     
                 for port in state:
@@ -61,9 +61,9 @@ class RelaisRequestHandler(socketserver.StreamRequestHandler):
                     self.request.send(bytes('500 Argument must be an int\n',"utf-8"))
                     continue
                     
-                (res,msg)=rc.relaisOn(nr,ser)
-                if not result:
-                    self.request.send(bytes('400 Error switching port on'+str(msg)+'\n',"utf-8"))
+                (res,msg)=rc.relaisOn(nr,cards, ser)
+                if not res:
+                    self.request.send(bytes('400 Error switching port on. '+str(msg)+'\n',"utf-8"))
                     continue
                 self.request.send(bytes('200 OK\n',"utf-8"))
 
@@ -78,9 +78,9 @@ class RelaisRequestHandler(socketserver.StreamRequestHandler):
                     self.request.send(bytes('500 Argument must be an int\n',"utf-8"))
                     continue
                     
-                (res,msg)=rc.relaisOff(nr,ser)
-                if not result:
-                    self.request.send(bytes('400 Error switching port off'+str(msg)+'\n',"utf-8"))
+                (res,msg)=rc.relaisOff(nr,cards, ser)
+                if not res:
+                    self.request.send(bytes('400 Error switching port off. '+str(msg)+'\n',"utf-8"))
                     continue
                 self.request.send(bytes('200 OK\n',"utf-8"))
     

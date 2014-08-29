@@ -20,12 +20,16 @@ def setup(ser):
 # from 0 accross all boards
 # data is a bitmask for all relais to be switched on, but we only support
 # switching one relais at a time
-def relaisOn(num,ser):
+def relaisOn(num,cards,ser):
     command=6
     addr=int((int(num)/8)+1)
     bit=int(num)%8
     data= 1 << bit
     xor=command^addr^data
+
+    if addr < 1 or addr > len(cards):
+        return(False,"No such port. "+str(num)+" requested, max is "+str(len(cards)*8-1))
+
 
     toSend=bytes([command, addr, data, xor])
     print("relais on :"+str(toSend))
@@ -49,12 +53,16 @@ def relaisOn(num,ser):
 # from 0 accross all boards
 # data is a bitmask for all relais to be switched on, but we only support
 # switching one relais at a time
-def relaisOff(num,ser):
+def relaisOff(num, cards, ser):
     command=7
     addr=int((int(num)/8)+1)
     bit=int(num)%8
     data= 1 << bit
     xor=command^addr^data
+
+    if addr < 1 or addr > len(cards):
+        return(False,"No such port. "+str(num)+" requested, max is "+str(len(cards)*8-1))
+
 
     toSend=bytes([command, addr, data, xor])
     print("relais off :"+str(toSend))
@@ -94,10 +102,10 @@ def getPortState(cards, ser):
             return(False,"Command Error", ports)
 
         if not data[0] == 253:
-            return(False,"Unknown response: "+str(data))
+            return(False,"Unknown response: "+str(data),ports)
 
         if not xorok(data):
-            return(False,"Checksum wrong")
+            return(False,"Checksum wrong",ports)
         
         boardports=data[2]
         for i in range(0,8):
