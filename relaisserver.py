@@ -8,12 +8,7 @@ DEVICE='/dev/ttyUSB0'
 
 ser = serial.Serial(DEVICE, 19200, timeout=2)
 
-setupcmd=rc.setup()
-print(str(setupcmd))
-
-ser.write(setupcmd)
-
-cards=rc.parseSetup(ser)
+cards=rc.setup(ser)
 
 print("Detected boards:")
 for card in cards:
@@ -21,15 +16,37 @@ for card in cards:
           
 
 
-for i in range(0,7):
+
+(res,msg,state)=rc.getPortState(cards,ser)
+if not res:
+    print("Error getting state"+str(msg))
+else:
+    print("Ports "+str(state))
+
+for i in range(0,16):
     (res,msg)=rc.relaisOn(i,ser)
-    print("Result "+str(res)+": "+msg)
+    #print("Result "+str(res)+": "+msg)
+    print("State "+str(rc.getPortState(cards,ser)[2]))
     time.sleep(0.5)
-    
-for i in range(0,7):
+
+
+(res,msg,state)=rc.getPortState(cards,ser)
+if not res:
+    print("Error getting state"+str(msg))
+else:
+    print("Ports "+str(state))
+
+for i in range(0,16):
     (res,msg)=rc.relaisOff(i,ser)
     print("Result "+str(res)+": "+msg)
     time.sleep(0.5)
+
+
+(res,msg,state)=rc.getPortState(cards,ser)
+if not res:
+    print("Error getting state"+str(msg))
+else:
+    print("Ports "+str(state))
 
 #(res,msg)=rc.relaisOff(0,ser)
 #print("Result "+str(res)+": "+msg)
