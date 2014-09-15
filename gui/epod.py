@@ -24,7 +24,7 @@ class ElectricityPodlet(object):
 
 
 		urwid.connect_signal(self.btn, 'click', self.PWRPress, self.name)
-		self.btnHolder=urwid.AttrMap(self.btn, None, focus_map='reversed')
+		self.btnHolder=urwid.AttrMap(self.btn, 'btn', focus_map='reversed')
 
 		p=urwid.Pile([ urwid.BoxAdapter(headline,1), ('pack',self.pwr), ('pack',eth), ('pack',self.btnHolder) ])
 		self.ui=urwid.LineBox(p)
