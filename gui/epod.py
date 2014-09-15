@@ -11,7 +11,9 @@ class ElectricityPodlet(object):
 
 	def buildGui(self):
 		txt=urwid.Text(('nodehead', self.name), align='center')
-		headline=urwid.Filler(txt,"middle")
+		#headline=urwid.Filler(txt,"middle")
+		headline=urwid.Padding(txt,align="center")
+		headline=urwid.AttrMap(headline,'nodehead')
 
 
 		eth=urwid.Text('Eth Link: '+str(self.ETHstate),align='left')
@@ -29,7 +31,9 @@ class ElectricityPodlet(object):
 		#urwid.connect_signal(self.btn, 'click', self.PWRPress, self.name)
 		#self.btnHolder=urwid.AttrMap(self.btn, 'btn', focus_map='reversed')
 		self.btnHolder=self.btn
-		p=urwid.Pile([ urwid.BoxAdapter(headline,1), ('pack',self.pwr), ('pack',eth), ('pack',self.btnHolder) ])
+		#p=urwid.Pile([ urwid.BoxAdapter(headline,1), ('pack',self.pwr), ('pack',eth), ('pack',self.btnHolder) ])
+		p=urwid.Pile([ headline, ('pack',self.pwr), ('pack',eth), ('pack',self.btnHolder) ])
+		
 		self.ui=urwid.LineBox(p)
 		
 

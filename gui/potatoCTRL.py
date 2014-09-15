@@ -8,7 +8,7 @@ palette = [
     ('banner', 'black', 'light gray'),
     ('streak', 'black', 'dark red'),
     ('bg', 'white', 'dark blue'),
-    ('btn', 'black', 'light cyan', 'bold'),
+    ('btn', 'black,bold', 'light cyan'),
     ('nodehead', 'black', 'yellow'),
     ('nodeON', 'dark green', 'dark blue'),
     ('nodeOFF', 'dark red', 'dark blue'),
