@@ -60,12 +60,6 @@ def enable_3d():
 def quit():
     raise urwid.ExitMainLoop()
 
-def make_button(label, callback):
-    btn=urwid.Button(label)
-    urwid.connect_signal(btn, 'click', callback, None)
-    btn=urwid.AttrMap(btn, 'btn', focus_map='reversed')
-    btn=urwid.Padding(btn, left=2, right=2)
-    return btn
 
 armed = False
 
