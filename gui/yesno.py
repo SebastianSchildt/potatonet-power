@@ -26,13 +26,12 @@ class YesNo(urwid.WidgetWrap):
 class ConfirmButton(urwid.PopUpLauncher):
 
     def __init__(self, label, callback):
-        btn=urwid.Button(label)
+        self.realbtn=urwid.Button(label)
         self.callback=callback
-        #urwid.connect_signal(btn, 'click', callback, None)
-        urwid.connect_signal(btn, 'click',
+        urwid.connect_signal(self.realbtn, 'click',
             lambda button: self.open_pop_up())
         
-        btn=urwid.AttrMap(btn, 'btn', focus_map='reversed')
+        btn=urwid.AttrMap(self.realbtn, 'btn', focus_map='reversed')
         btn=urwid.Padding(btn, left=2, right=2)
         
         self.yes=False
@@ -51,6 +50,9 @@ class ConfirmButton(urwid.PopUpLauncher):
     def perform_action(self,data):
         self.callback()
         self.close_pop_up()
+
+    def set_label(self, newlabel):
+        self.realbtn.set_label(newlabel)
 
 
     def get_pop_up_parameters(self):
