@@ -16,27 +16,18 @@ palette = [
     ('reversed', 'standout', '')]
 
 
-def exit_on_q(key):
-    global armed
-    if key in ('q', 'Q') and not armed:
-    	footer.set_text( ('banner', " Really exit (y/n)? ") )
-    	armed=True
-    elif key in ('n', 'N') and armed:
-    	footer.set_text( ('banner', " Press q to exit ") )
-    	armed=False
-    elif key in ('y', 'Y') and armed:
-        raise urwid.ExitMainLoop()
-    elif key == 'f1':
+def global_keys(key):
+    if key == 'f1':
         btn_init.open_pop_up()
     elif key == 'f2':
         btn_state.open_pop_up()
     elif key == 'f3':
         btn_3d.open_pop_up()
-    elif key == 'f12':
+    elif key == 'f12' or key == 'q':
         btn_quit.open_pop_up()
         
-    else:
-    	footer.set_text( ('banner',"Unknown input :"+str(repr(key))))
+    #else:
+    #	footer.set_text( ('banner',"Unknown input :"+str(repr(key))))
     
 def item_chosen(button, choice):
     footer.set_text( ('banner',"You chose: "+str(choice)))
@@ -49,19 +40,12 @@ def update_state():
     pass
 
 def enable_3d():
-    #sa.Alert("Msg","Jo")
-    d=dialog.do_yesno("Realy", 10,22)
-    exitcode, exitstring = d.main()
-    #print("Code is "+str(exitcode)+" string is "+str(exitstring))
-    #loop.screen=urwid.raw_display.Screen()
-    loop.widget=p
-    loop.draw_screen()
+    pass
 
 def quit():
     raise urwid.ExitMainLoop()
 
 
-armed = False
 
 title = urwid.Text(('banner', " PotatoControl "), align='center')
 map1 = urwid.AttrMap(title, 'streak')
@@ -69,8 +53,6 @@ map1 = urwid.AttrMap(title, 'streak')
 fill = urwid.Filler(map1, 'top')
 map2 = urwid.AttrMap(fill, 'bg')
 
-footer = urwid.Text(('banner', " Press q to exit "), align='left')
-map3 = urwid.AttrMap(footer, 'bg')
 
 
 ####Make a button thingy
@@ -104,10 +86,10 @@ buttonrow=urwid.AttrMap(buttonrow, 'bg')
 
 
 
-p=urwid.Pile([('pack',map1), map4, ('pack',buttonrow), ('pack',map3)])
+p=urwid.Pile([('pack',map1), map4, ('pack',buttonrow)])
 
 #p=urwid.Pile([map2, nodes, ('pack',map3)])
 
 #loop = urwid.MainLoop(map2, palette, unhandled_input=exit_on_q)
-loop = urwid.MainLoop(p, palette, unhandled_input=exit_on_q,pop_ups=True)
+loop = urwid.MainLoop(p, palette, unhandled_input=global_keys,pop_ups=True)
 loop.run()
