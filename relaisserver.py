@@ -140,6 +140,7 @@ class RelaisRequestHandler(socketserver.StreamRequestHandler):
 
 
 class RelaisServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    allow_reuse_address = True
     
     def __init__(self, server_address, handler_class=RelaisRequestHandler):
         print('Init server')
