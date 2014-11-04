@@ -126,8 +126,8 @@ def setPort(portnum, enabled):
 	return True
 
 
-setPort(3,False)
-(enabled,link)=getState()
+#setPort(3,False)
+#(enabled,link)=getState()
 #setPort(0,False)
 #setPort(3,True)
 #(enabled,link)=getState()

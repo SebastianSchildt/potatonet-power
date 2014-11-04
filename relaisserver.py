@@ -1,6 +1,8 @@
 #!/bin/python3
 
 import relaiscommands as rc
+import reliablechoice as tplink
+
 import serial
 import time
 import socketserver
@@ -102,7 +104,28 @@ class RelaisRequestHandler(socketserver.StreamRequestHandler):
                     
                 self.request.send(bytes('200 OK\n',"utf-8"))
 
-                
+	    ########### TPLINK status
+            elif cmd[0] == 'tpstate':
+                    (enabled,link)=tplink.getState()
+		    #unify list: first bit=enabled, second bit=link
+                    if len(enabled) == 0 or len(link)==0:
+                        self.request.send(bytes('400 Invalid data received','utf-8'))
+                        continue
+                    print("Enabled: "+str(enabled))
+                    print("Link: "+str(link))
+
+                    for port in range(0,len(enabled)):
+                       if int(link[port]) != 0:
+                          enabled[port]=int(enabled[port])+2
+
+                    reply="200 "
+                    for port in enabled:
+                       reply+=(str(port)+", ")
+                    reply=reply[:-2]+'\n'
+                    self.request.send(bytes(reply,'utf-8'))
+
+
+		
             ########### UNKNOWN CMD                
             else:
                 self.request.send(bytes('500 Unknown comand: '+str(cmd[0])+'\n',"utf-8"))
