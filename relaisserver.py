@@ -124,7 +124,39 @@ class RelaisRequestHandler(socketserver.StreamRequestHandler):
                     reply=reply[:-2]+'\n'
                     self.request.send(bytes(reply,'utf-8'))
 
+            ########### SWITCH ON
+            elif cmd[0] == 'tpon':
+                if len(cmd) != 2:
+                    self.request.send(bytes('500 Wrong numebr of arguments. 1 needed\n',"utf-8"))
+                    continue
+                try:
+                    nr=int(cmd[1])
+                except ValueError:
+                    self.request.send(bytes('500 Argument must be an int\n',"utf-8"))
+                    continue
+                    
+                res=tplink.setPort(nr,True)
+                if not res:
+                    self.request.send(bytes('400 Error switching port on.\n',"utf-8"))
+                    continue
+                self.request.send(bytes('200 OK\n',"utf-8"))
 
+            ########### SWITCH OFF
+            elif cmd[0] == 'tpoff':
+                if len(cmd) != 2:
+                    self.request.send(bytes('500 Wrong numebr of arguments. 1 needed\n',"utf-8"))
+                    continue
+                try:
+                    nr=int(cmd[1])
+                except ValueError:
+                    self.request.send(bytes('500 Argument must be an int\n',"utf-8"))
+                    continue
+                    
+                res=tplink.setPort(nr,False)
+                if not res:
+                    self.request.send(bytes('400 Error switching port off.\n',"utf-8"))
+                    continue
+                self.request.send(bytes('200 OK\n',"utf-8"))
 		
             ########### UNKNOWN CMD                
             else:
