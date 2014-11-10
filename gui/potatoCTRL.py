@@ -1,8 +1,10 @@
 import urwid
-import time
+import time, sys
 import epod
-import dialog
+#import dialog
+import netclient
 from yesno import ConfirmButton
+
 
 palette = [
     ('banner', 'black', 'light gray'),
@@ -34,8 +36,8 @@ def item_chosen(button, choice):
     
 def re_init():
     print("YO")
-    pass
-
+    netclient.transceive("state")
+    
 def update_state():
     pass
 
@@ -47,6 +49,9 @@ def quit():
 
 
 
+if not netclient.init():
+	sys.exit(-1)
+
 title = urwid.Text(('banner', " PotatoControl "), align='center')
 map1 = urwid.AttrMap(title, 'streak')
 
@@ -57,15 +62,45 @@ map2 = urwid.AttrMap(fill, 'bg')
 
 ####Make a button thingy
 body=[]
-for c in range(0,20):
+epods=[]
+for c in range(0,24):
     button=epod.ElectricityPodlet("Node "+str(c),c)
     body.append(button.ui)
-
+    epods.append(button)
     #body.append(urwid.AttrMap(button.ui, None, focus_map='reversed'))
 
 
+#GET power states
+res=netclient.transceive("state")
+print("Got "+str(res))
+if not res.startswith("200"):
+	print("Error")
+	sys.exit(0)
+
+currpod=0
+for relais in res[3:].split(","):
+	if int(relais) == 0:
+		epods[currpod].updatePowerState(False)
+	else:
+		epods[currpod].updatePowerState(True)
+	currpod=currpod+1
+
+
+#GET ETH states
+res=netclient.transceive("tpstate")
+print("Got "+str(res))
+if not res.startswith("200"):
+	print("Error")
+	sys.exit(0)
+
+currpod=0
+for relais in res[3:].split(","):
+	epods[currpod].updateEthernetState(int(relais))
+	currpod=currpod+1
+
+
 #menu=urwid.GridFlow(urwid.SimpleFocusListWalker(body),25,1,1,'center')
-menu=urwid.GridFlow(body,25,3,1,'center')
+menu=urwid.GridFlow(body,34,3,1,'center')
 
 nodes = urwid.Padding(menu, left=2, right=2)
 fill2 = urwid.Filler(nodes, 'top')
