@@ -7,7 +7,7 @@ import serial
 import time
 import socketserver
 
-DEVICE='/dev/ttyUSB0'
+DEVICE='/dev/ttyS0'
 
 
 
