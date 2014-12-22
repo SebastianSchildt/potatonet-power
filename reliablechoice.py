@@ -23,8 +23,8 @@ _flow_info  = ["Off", "On"];
 
 def login():
 	global _lastlogin
-	req=h.Request("http://"+TP_LINK_HOST+"/logon.cgi", method="POST")
-	res=h.urlopen(req,data=bytes("username="+USER+"&password="+PASS+"&logon=Login","utf-8"))
+	req=h.Request("http://"+TP_LINK_HOST+"/logon.cgi")
+	res=h.urlopen(req,data=bytes("username="+USER+"&password="+PASS+"&logon=Login","utf-8"),timeout=timeout)
 	
 	if res.status != 200:
 		print("Error logging in "+str(res.status))
@@ -135,4 +135,3 @@ def setPort(portnum, enabled):
 #(enabled,link)=getState()
 #print("Enabled list "+str(enabled))
 #print("Link states "+str(link))
-
