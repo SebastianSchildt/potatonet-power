@@ -20,9 +20,9 @@ else
 fi
 
 
-echo "FAILOVER: Currently $NOW is active"
+echo "Currently $NOW is active"
 
-echo -n "FAILOVER: Current state is: "
+echo -n "Current state is: "
 
 
 case "$STATE" in
@@ -46,7 +46,7 @@ esac
 
 if [ "$NOW" != "$CHOICE" ] 
 then
-	echo "FAILOVER: Switching from $NOW to $CHOICE."
+	echo "Switching from $NOW to $CHOICE."
 	if [ "$CHOICE" == "ppp" ]
 	then
 		ip rule add from all table cellular
@@ -55,7 +55,7 @@ then
 	fi
 	killall -USR1 autossh
 else
-	echo "FAILOVER: No action taken"
+	echo "No action taken"
 fi
 
 
