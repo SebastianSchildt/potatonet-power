@@ -5,6 +5,8 @@
 # 1 Addr x XOR
 #always use bcast addr
 def setup(ser):
+    print("Setup: Emptying card buffers")
+    readanddiscard(ser)
     command=1
     addr=1
     data =0
@@ -128,22 +130,51 @@ def parseSetup(ser):
         if len(data)==0:
             print("All boards found")
             break
-        
+
+        print("Got SETUP answer:", end="")
+        for byte in data:
+            print(""+format(byte, '02x'), end="")
+        print("") 
+      
+        if len(data) != 4:
+            print("Short read. Expected 4 got "+str(len(data)))
+            continue
+ 
         if data[0] == 1: #last card broadcasting back to server
             print("Last board in chain reached")
             #could break, but for safety read again
             continue
 
+        if data[0] != 254:
+            print("Unknown SETUP response: "+str(data[0]))
+            continue
         
-
-        print("Found board")
-        card['address']=currAddr
-        card['firmware']=data[2]
-        card['xorok']= ( data[3]==(data[0]^data[1]^data[2]))
-        cards.append(card)
-        currAddr=currAddr+1
+        if xorok(data):
+            print("Found board")
+            card['address']=currAddr
+            card['firmware']=data[2]
+            card['xorok']= xorok(data)
+            cards.append(card)
+            currAddr=currAddr+1
+        else:
+            print("Checksum error in MSG: ", end="")
 
     return cards
+
+# In case of a failure read and discard data until no more data comming from relais
+# read at most 1024 bytes (256 msgs)
+def readanddiscard(ser):
+    command=0
+    addr=0
+    data =0
+
+    xor=command^addr^data
+    toSend= bytes([command, addr, data, xor])
+    ser.write(toSend)
+
+    data=ser.read(1024)
+    print("Ignored "+str(len(data))+" bytes from relaiscard")
+
 
                             
 def xorok(data):
