@@ -6,10 +6,12 @@ import reliablechoice as tplink
 import serial
 import time
 import socketserver
+import sys
 
 DEVICE='/dev/ttyS0'
 
-
+EXPECTED_CARDS=3
+EXPECTED_FIRMWARES = [11]
 
 
 
@@ -207,8 +209,16 @@ cards=rc.setup(ser)
 print("Detected boards:")
 for card in cards:
     print("Found card "+str(card['address'])+" with firmware version "+str(card['firmware'])+". Checksum correct?: "+str(card['xorok']))
-          
 
+# Sanity checks, and exit if something is wrong
+if len(cards) != EXPECTED_CARDS:
+    print("Expected "+str(EXPECTED_CARDS)+" but found "+str(len(cards))+". Exiting.")
+    sys.exit(-1)
+
+for card in cards:
+    if card['firmware'] not in EXPECTED_FIRMWARES:
+        print("Found unexpected firmware "+str(card['firmware'])+". Exiting.")          
+        sys.exit(-2)
 
 print("Starting server")
 address = ('localhost', 2222) # let the kernel give us a port
