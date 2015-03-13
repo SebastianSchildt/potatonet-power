@@ -4,7 +4,7 @@
 TEST_IP=193.99.144.80
 
 
-ping -I eth0 -q -c 2 $TEST_IP > /dev/null  && ETH0UP=1 || ETH0UP=0;
+ping -I eth0.10 -q -c 2 $TEST_IP > /dev/null  && ETH0UP=1 || ETH0UP=0;
 
 ping -I ppp0 -q -c 2 $TEST_IP > /dev/null  && PPP0UP=2 || PPP0UP=0;
 
