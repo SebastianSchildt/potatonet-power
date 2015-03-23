@@ -221,7 +221,7 @@ for card in cards:
         sys.exit(-2)
 
 print("Starting server")
-address = ('localhost', 2222) # let the kernel give us a port
+address = ('127.0.0.1', 2222) # let the kernel give us a port
 server = RelaisServer(address, RelaisRequestHandler)
 server.serve_forever()
 
