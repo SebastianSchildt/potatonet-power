@@ -50,8 +50,12 @@ then
 	if [ "$CHOICE" == "ppp" ]
 	then
 		ip rule add from all table cellular
+		echo "Disabling Internet for field nodes"
+		sysctl -w net.ipv4.ip_forward=0
 	else
 		ip rule del from all table cellular
+		echo "Reenabling Internet for field nodes"
+		sysctl -w net.ipv4.ip_forward=1
 	fi
 	killall -USR1 autossh
 else
