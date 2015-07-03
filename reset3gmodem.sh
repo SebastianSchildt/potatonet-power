@@ -8,7 +8,12 @@ supervisorctl stop pppkeepalive
 supervisorctl stop wvdial
 sleep 2
 echo "Force modem reset"
-echo -e "ATZ\nAT+CFUN=1,1" > /dev/ttyUSB0
+chat -v \
+	TIMEOUT 10 \
+	''     '+++ATZ'  \
+	'OK' 'AT+CFUN=1,1' \
+	'OK' '' \
+< /dev/ttyUSB0 > /dev/ttyUSB0
 sleep 10
 echo "Restarting wvdial service"
 supervisorctl start wvdial
